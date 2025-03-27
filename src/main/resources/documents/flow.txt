@@ -1,0 +1,12 @@
+Relationships:
+Users 🡒 Orders (1:M)
+
+Users 🡒 Reviews (1:M)
+
+Orders 🡒 Order_Items (1:M)
+
+Order_Items 🡒 Products (M:1)
+
+Products 🡒 Categories (M:1)
+
+Orders 🡒 Payments (1:1)
