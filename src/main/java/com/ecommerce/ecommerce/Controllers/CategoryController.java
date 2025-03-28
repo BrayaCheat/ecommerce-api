@@ -5,6 +5,9 @@ import com.ecommerce.ecommerce.DTO.Response.CategoryResponseDTO;
 import com.ecommerce.ecommerce.Services.ServiceImpl.CategoryServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,16 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/categories")
-    public ResponseEntity<List<CategoryResponseDTO>> listCategory() {
-        return ResponseEntity.status(200).body(categoryService.listCategory());
+    public ResponseEntity<List<CategoryResponseDTO>> listCategory(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String categoryName
+    ) {
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return ResponseEntity.status(200).body(categoryService.listCategory(pageable, categoryName));
     }
 
     @GetMapping(value = "/categories/{id}")
@@ -45,7 +56,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(value = "/admin/categories/{id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Integer id){
+    public ResponseEntity<String> deleteCategory(@PathVariable Integer id) {
         return ResponseEntity.status(200).body(categoryService.deleteCategory(id));
     }
 }

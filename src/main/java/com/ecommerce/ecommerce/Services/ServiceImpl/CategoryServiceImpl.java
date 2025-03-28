@@ -8,6 +8,9 @@ import com.ecommerce.ecommerce.Repositories.CategoryRepository;
 import com.ecommerce.ecommerce.Services.CategoryService;
 import com.ecommerce.ecommerce.Utils.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,9 +54,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponseDTO> listCategory() {
-        return categoryRepository.findAll().stream().map(categoryMapper::toDTO).collect(Collectors.toList());
+    public List<CategoryResponseDTO> listCategory(Pageable pageable, String categoryName) {
+        Specification<Category> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (categoryName != null) {
+                predicates.add(cb.like(root.get("name"), "%" + categoryName + "%"));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return categoryRepository.findAll(spec, pageable)
+                .stream()
+                .map(categoryMapper::toDTO)
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public CategoryResponseDTO getCategory(Integer id) {
