@@ -13,8 +13,13 @@ public class DemoController {
         return "Admin protected";
     }
 
-    @GetMapping
+    @GetMapping("/user")
     public String getUser(){
         return "User protected";
+    }
+
+    @GetMapping("/")
+    public String getDemo(){
+        return "No protected";
     }
 }

@@ -36,9 +36,11 @@ public class Order {
     private String status; // PENDING, SHIPPED, DELIVERED
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Payment payment;
 
     @CreationTimestamp

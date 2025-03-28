@@ -44,10 +44,12 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<OrderItem> orderItems = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-//    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Review> reviews = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDate createdAt;

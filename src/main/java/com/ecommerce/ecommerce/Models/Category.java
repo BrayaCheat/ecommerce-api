@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,10 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private String imageUrl;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Product> products = new ArrayList<>();
 
     @CreationTimestamp
