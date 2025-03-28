@@ -7,6 +7,7 @@ import com.ecommerce.ecommerce.Models.Category;
 import com.ecommerce.ecommerce.Repositories.CategoryRepository;
 import com.ecommerce.ecommerce.Services.CategoryService;
 import com.ecommerce.ecommerce.Utils.FileService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,19 +38,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDTO addCategory(CategoryRequestDTO dto, List<MultipartFile> files) throws IOException {
-        if(files.isEmpty()) throw new RuntimeException("File not found");
-        List<String> listFiles = new ArrayList<>();
-        for(MultipartFile file : files){
-            if(!file.isEmpty()){
-                String fileUrl = fileService.uploadFile(file);
-                listFiles.add(fileUrl);
+        List<String> images = files.stream().filter(file -> !file.isEmpty()).map(file -> {
+            try {
+                return fileService.uploadFile(file);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to upload image" + ex.getMessage());
             }
-        }
-        // will normalize image table
+        }).filter(Objects::nonNull).toList();
         Category category = Category.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
-                .imageUrl(objectMapper.writeValueAsString(listFiles))
+                .imageUrl(objectMapper.writeValueAsString(images))
                 .build();
         return categoryMapper.toDTO(categoryRepository.save(category));
     }
@@ -77,29 +77,31 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDTO updateCategory(Integer id, CategoryRequestDTO dto, List<MultipartFile> files) throws IOException {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found."));
-        category.setName(dto.getName() != null ? dto.getName() : category.getName());
-        category.setDescription(dto.getDescription() != null ? dto.getDescription() : category.getDescription());
-        if(files.isEmpty()) throw new RuntimeException("File not found.");
-        List<String> listFiles = new ArrayList<>();
-        for(MultipartFile file : files){
-            if(!file.isEmpty()){
-                String fileUrl = fileService.uploadFile(file);
-                listFiles.add(fileUrl);
+        List<String> newImages = files.isEmpty()
+                ? objectMapper.readValue(category.getImageUrl(), new TypeReference<List<String>>() {
+        })
+                : files.stream().map(file -> {
+            try {
+                return fileService.uploadFile(file);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to upload image" + ex.getMessage());
             }
-        }
-        String images = String.join(",", listFiles);
-        category.setImageUrl(images);
+        }).filter(Objects::nonNull).toList();
+
+
+        if (dto.getName() != null) category.setName(dto.getName());
+        if (dto.getDescription() != null) category.setDescription(dto.getDescription());
+        category.setImageUrl(objectMapper.writeValueAsString(newImages));
         return categoryMapper.toDTO(categoryRepository.save(category));
     }
 
+
     @Override
     public String deleteCategory(Integer id) {
-        if(!categoryRepository.existsById(id)) throw new RuntimeException("Category not found.");
-        categoryRepository.deleteById(id);
-        if(categoryRepository.existsById(id)){
-            return "Failed to delete category";
-        }else{
-            return "Category deleted";
+        if (!categoryRepository.existsById(id)) {
+            throw new RuntimeException("Category not found.");
         }
+        categoryRepository.deleteById(id);
+        return "Category deleted successfully.";
     }
 }
