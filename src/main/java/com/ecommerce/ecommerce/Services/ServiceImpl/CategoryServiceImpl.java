@@ -7,6 +7,8 @@ import com.ecommerce.ecommerce.Models.Category;
 import com.ecommerce.ecommerce.Repositories.CategoryRepository;
 import com.ecommerce.ecommerce.Services.CategoryService;
 import com.ecommerce.ecommerce.Utils.FileService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,16 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final FileService fileService;
+    private final ObjectMapper objectMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, FileService fileService){
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper, FileService fileService, ObjectMapper objectMapper){
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
         this.fileService = fileService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -37,11 +42,10 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         // will normalize image table
-        String images = String.join(",",listFiles);
         Category category = Category.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
-                .imageUrl(images)
+                .imageUrl(objectMapper.writeValueAsString(listFiles))
                 .build();
         return categoryMapper.toDTO(categoryRepository.save(category));
     }

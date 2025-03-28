@@ -6,14 +6,16 @@ import com.ecommerce.ecommerce.DTO.Response.LoginResponseDTO;
 import com.ecommerce.ecommerce.Models.User;
 import com.ecommerce.ecommerce.Services.ServiceImpl.AuthenticationServiceImpl;
 import com.ecommerce.ecommerce.Services.ServiceImpl.JwtServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/auth")
+@Tag(name = "Authentication")
 @RestController
+@RequestMapping("/auth")
 public class AuthenticationController {
     private final JwtServiceImpl jwtService;
 
