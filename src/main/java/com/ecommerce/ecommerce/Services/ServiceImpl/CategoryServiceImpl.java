@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (categoryName != null) {
                 predicates.add(cb.like(root.get("name"), "%" + categoryName + "%"));
             }
-            return cb.and(predicates.toArray(new Predicate[0]));
+            return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
         };
         return categoryRepository.findAll(spec, pageable)
                 .stream()
