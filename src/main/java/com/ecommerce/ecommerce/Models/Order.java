@@ -35,7 +35,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private orderStatus status; // PENDING, SHIPPED, DELIVERED
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonBackReference
     private List<OrderItem> orderItems = new ArrayList<>();
 
