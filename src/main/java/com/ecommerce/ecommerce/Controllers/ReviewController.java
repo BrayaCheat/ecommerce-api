@@ -45,7 +45,7 @@ public class ReviewController {
         return ResponseEntity.status(200).body(reviewService.listReivew(pageable));
     }
 
-    @DeleteMapping("/reviews/{id}")
+    @DeleteMapping("/admin/reviews/{id}")
     public ResponseEntity<String> deleteReview(@PathVariable Integer id){
         return ResponseEntity.status(200).body(reviewService.deleteReivew(id));
     }
