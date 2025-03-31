@@ -32,8 +32,8 @@ public class Order {
     @Column(nullable = false)
     private Double totalPrice;
 
-    @Column(nullable = false)
-    private String status; // PENDING, SHIPPED, DELIVERED
+    @Enumerated(EnumType.STRING)
+    private orderStatus status; // PENDING, SHIPPED, DELIVERED
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonBackReference
@@ -48,5 +48,9 @@ public class Order {
 
     @UpdateTimestamp
     private LocalDate updatedAt;
+
+    public enum orderStatus {
+        PENDING, COMPLETE, CANCELLED
+    }
 }
 
