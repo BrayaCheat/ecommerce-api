@@ -69,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponseDTO> listProducts(Pageable pageable, String productName, Double minPrice, Double maxPrice) {
+        System.out.println("Log all products: " + productRepository.findAll().toArray().length);
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (productName != null) {

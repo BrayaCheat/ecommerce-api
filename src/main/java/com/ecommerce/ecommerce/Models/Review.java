@@ -39,5 +39,8 @@ public class Review {
 
     @CreationTimestamp
     private LocalDate createdAt;
+
+    @CreationTimestamp
+    private LocalDate updatedAt;
 }
 
