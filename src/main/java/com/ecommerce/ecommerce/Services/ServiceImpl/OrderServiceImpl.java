@@ -46,7 +46,10 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemRequestDTO item : dto.getItems()) {
             Product product = productRepository.findById(item.getProductId()).orElseThrow(() -> new RuntimeException("Product with id: " + item.getProductId() + " not found."));
             if (product.getStockQuantity() < item.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName());
+                if(product.getStockQuantity() > 0){
+                    throw new RuntimeException("Insufficient stock for product: " + product.getName() + " there are only: " + product.getStockQuantity() + " left!");
+                }
+                throw new RuntimeException(product.getName() + " out of stock!");
             }
 
             // deduct stock
@@ -57,10 +60,10 @@ public class OrderServiceImpl implements OrderService {
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
                     .quantity(item.getQuantity())
-                    .priceAtPurchase(product.getPrice() * item.getQuantity())
+                    .priceAtPurchase(product.getPrice())
                     .build();
             orderItems.add(orderItem);
-            totalPrice += orderItem.getPriceAtPurchase();
+            totalPrice += (item.getQuantity() * product.getPrice());
         }
 
         Order order = Order.builder()
@@ -109,10 +112,10 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    @Scheduled(fixedRate = 1000) // Runs every 1 minute
+    @Scheduled(fixedRate = 60000) // Runs every 1 minute
     public void autoCancelUnpaidOrder() {
-//        autoCancelUnpaidOrderTransactional();
-        System.out.println("Background worker");
+        autoCancelUnpaidOrderTransactional();
+//        System.out.println("Background worker");
     }
 
     @Override
