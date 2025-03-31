@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpecificationExecutor<Order> {
-    @Query(value = "select * from orders o where o.status = 'PENDING' and o.createdAt <= :timeLimit", nativeQuery = true)
+    @Query(value = "select * from orders o where o.status = 'PENDING' and o.created_at <= :timeLimit", nativeQuery = true)
     List<Order> findUnpaidOrders(@Param("timeLimit") LocalDateTime timeLimit);
 }
