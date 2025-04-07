@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,22 +69,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponseDTO> listProducts(Pageable pageable, String productName, Double minPrice, Double maxPrice) {
+    public List<ProductResponseDTO> listProducts(Pageable pageable, String productName, Double minPrice, Double maxPrice, String categoryId) {
         System.out.println("Log all products: " + productRepository.findAll().toArray().length);
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (productName != null) {
-                predicates.add(cb.like(cb.lower(root.get("name")), "%" + productName.toLowerCase() + "%"));
-            }
-            if (minPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
-            if (maxPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
+            // Filter by category ID (corrected)
+            Optional.ofNullable(categoryId)
+                    .ifPresent(id -> predicates.add(cb.equal(root.get("category").get("id"), id)));
+            // Filter by product name (case-insensitive search)
+            Optional.ofNullable(productName)
+                    .ifPresent(name -> predicates.add(cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%")));
+            // Filter by price range
+            Optional.ofNullable(minPrice)
+                    .ifPresent(min -> predicates.add(cb.greaterThanOrEqualTo(root.get("price"), min)));
+            Optional.ofNullable(maxPrice)
+                    .ifPresent(max -> predicates.add(cb.lessThanOrEqualTo(root.get("price"), max)));
+
             return predicates.isEmpty() ? cb.conjunction() : cb.and(predicates.toArray(new Predicate[0]));
         };
-        return productRepository.findAll(spec, pageable).map(productMapper::toDTO);
+        return productRepository.findAll(spec, pageable).stream().map(productMapper::toDTO).toList();
     }
 
     @Override
@@ -120,5 +124,10 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.deleteById(id);
         return "Category deleted successfully.";
+    }
+
+    @Override
+    public List<ProductResponseDTO> getProductByCategoryId(Integer categoryId) {
+        return productRepository.getProductByCategoryId(categoryId).stream().map(productMapper::toDTO).toList();
     }
 }

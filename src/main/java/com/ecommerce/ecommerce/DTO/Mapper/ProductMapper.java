@@ -17,6 +17,8 @@ public interface ProductMapper {
 
     // Map Entity -> DTO (Response)
     @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "reviews", source = "reviews")
     ProductResponseDTO toDTO(Product product);
 
 }

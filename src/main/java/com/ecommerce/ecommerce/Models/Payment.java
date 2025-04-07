@@ -29,7 +29,8 @@ public class Payment {
 
     private String paymentMethod; // CARD, COD, WALLET
 
-    private String status; // PENDING, COMPLETED, FAILED
+    @Enumerated(EnumType.STRING)
+    private paymentStatus status; // PENDING, COMPLETED, FAILED
 
     private String transactionId;
 
@@ -38,5 +39,9 @@ public class Payment {
 
     @UpdateTimestamp
     private LocalDate updatedAt;
+
+    public enum paymentStatus {
+        PENDING, COMPLETE, CANCELLED
+    }
 }
 

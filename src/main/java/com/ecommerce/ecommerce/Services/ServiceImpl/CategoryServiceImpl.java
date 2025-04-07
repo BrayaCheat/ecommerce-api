@@ -65,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll(spec, pageable)
                 .stream()
                 .map(categoryMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 

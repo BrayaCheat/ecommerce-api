@@ -16,6 +16,7 @@ public interface CategoryMapper {
     Category toEntity(CategoryRequestDTO dto);
 
     // Map Entity -> DTO (Response)
+    @Mapping(target = "products", ignore = true)
     CategoryResponseDTO toDTO(Category category);
 
 }

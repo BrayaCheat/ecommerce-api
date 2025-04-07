@@ -12,7 +12,8 @@ import java.util.List;
 public interface ProductService {
     ProductResponseDTO addProduct(Integer categoryId, ProductRequestDTO dto, List<MultipartFile> files) throws IOException;
     ProductResponseDTO getProductById(Integer id);
-    Page<ProductResponseDTO> listProducts(Pageable pageable, String productName, Double minPrice, Double maxPrice);
+    List<ProductResponseDTO> listProducts(Pageable pageable, String productName, Double minPrice, Double maxPrice, String categoryId);
     ProductResponseDTO updateProduct(Integer categoryId, Integer id, ProductRequestDTO dto, List<MultipartFile> files) throws IOException;
     String deleteProduct(Integer id);
+    List<ProductResponseDTO> getProductByCategoryId (Integer categoryId);
 }

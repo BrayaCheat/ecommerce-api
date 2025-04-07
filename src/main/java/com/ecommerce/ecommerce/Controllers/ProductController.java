@@ -31,18 +31,19 @@ public class ProductController {
     }
 
     @GetMapping(value = "/products")
-    public ResponseEntity<Page<ProductResponseDTO>> listProduct(
+    public ResponseEntity<List<ProductResponseDTO>> listProduct(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String direction,
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String categoryId
     ) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return ResponseEntity.status(200).body(productService.listProducts(pageable, productName, minPrice, maxPrice));
+        return ResponseEntity.status(200).body(productService.listProducts(pageable, productName, minPrice, maxPrice, categoryId));
     }
 
     @GetMapping(value = "/products/{id}")
@@ -63,5 +64,10 @@ public class ProductController {
     @DeleteMapping(value = "/admin/products/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Integer id) {
         return ResponseEntity.status(200).body(productService.deleteProduct(id));
+    }
+
+    @GetMapping("/category/{categoryId}/products")
+    public ResponseEntity<List<ProductResponseDTO>> getProductByCategoryId (@PathVariable Integer categoryId){
+        return ResponseEntity.status(200).body(productService.getProductByCategoryId(categoryId));
     }
 }
